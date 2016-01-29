@@ -632,6 +632,12 @@ var UnoChoice = UnoChoice || (function($) {
             var filterElement = _self.getFilterElement();
             var filteredElement = _self.getParameterElement();
             var text = filterElement.value.toLowerCase();
+            var tagName = filteredElement.tagName;
+            if (tagName == undefined) {
+            	if ($(".mySelect").length) {
+            		tagName="SELECT";
+            	}
+            } 
             var options = _self.originalArray;
             var newOptions = Array();
             for (var i = 0; i < options.length; i++) {
@@ -651,15 +657,34 @@ var UnoChoice = UnoChoice || (function($) {
                     }
                 }
             }
-            var tagName = filteredElement.tagName;
             if (tagName == 'SELECT') { // handle SELECT's
-               jQuery(filteredElement).children().remove();
+               var select = jQuery(filteredElement);
+               var html = '<select class="mySelect" size="' + select.attr('size') + '" name="' + select.attr('name') + '"';
+               
+               var multiAttr = select.attr('multiple');
+               // For some browsers, `attr` is undefined; for others,
+               // `attr` is false.  Check for both.
+	           if (typeof multiAttr !== typeof undefined && multiAttr !== false) {
+	        	   html += ' multiple="' + select.attr('multiple') + '" '; 
+	           }
+               html +=  'id="' + select.attr('id') + '">';
                for (var i = 0; i < newOptions.length ; ++i) {
-                   var opt = document.createElement('option');
-                   opt.value = newOptions[i].value;
-                   opt.innerHTML = newOptions[i].innerHTML;
-                   jQuery(filteredElement).append(opt);
+            	   html += '<option value="' + newOptions[i].value + '">' + newOptions[i].value + '</option>';
                }
+               html += '</select>';
+               var newSelect = $(html);
+               var div = select.parent();
+               select.remove();
+               div.prepend(newSelect);
+               _self.paramElement=newSelect;
+
+//               jQuery(filteredElement).children().remove();
+//               for (var i = 0; i < newOptions.length ; ++i) {
+//                   var opt = document.createElement('option');
+//                   opt.value = newOptions[i].value;
+//                   opt.innerHTML = newOptions[i].innerHTML;
+//                   jQuery(filteredElement).append(opt);
+//              }
             } else if (tagName == 'DIV') { // handle CHECKBOXES, RADIOBOXES and other elements (Jenkins renders them as tables)
                if (jQuery(filteredElement).children().length > 0 && jQuery(filteredElement).children()[0].tagName == 'TABLE') {
                     var table = filteredElement.children[0];

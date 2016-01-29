@@ -42,7 +42,8 @@
         </j:otherwise>
       </j:choose>
       <j:if test="${it.filterable}">
-        <input class='uno_choice_filter' type='text' value='' name='test' placeholder='Filter' />
+        <br/>
+        <input class='uno_choice_filter' type='text' value='' name='test' placeholder='Filtro' />
       </j:if>
     </div>
   </f:entry>
